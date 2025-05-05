@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brew Haven Coffee</title>
+  
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Styles -->
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .register-body { background: #f5eee6; }
+    .login-body { background: #ede0d4; }
+    .auth-container {
+      background-color: #fff;
+      padding: 30px 40px;
+      max-width: 400px;
+      margin: 100px auto;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .auth-container h2 {
+      margin-bottom: 20px;
+      font-size: 30px;
+    }
+    .auth-container form input, .auth-container button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 14px 16px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    .auth-container button {
+      border: none;
+      background-color: #6b4f4f;
+      color: #fff;
+      cursor: pointer;
+    }
+    .auth-container p { margin-top: 15px; font-size: 14px; }
+    .auth-container a { text-decoration: none; color: #6b4f4f; }
+
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+      line-height: 1.6;
+      background-color: #fdf6f0;
+      color: #3e2f23;
+    }
+
+    img {
+      max-width: 100%;
+      height: 50%;
+      border-radius: 10px;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Container */
+    .header {
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 2rem 0;
+    }
+
+    /* Header */
+    header {
+      background-color: #4b2e1f;
+      height: 90px;
+      color: #fff;
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      margin-left: -6%;
+      margin-top: -2.5%;
+    }
+
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 5rem;
+      justify-content: center;
+      margin-top: -4%;
+    }
+
+
+    nav a {
+      color: #fff;
+      font-weight: bold;  
+      font-size: 18px;
+      transition: color 0.3s ease;
+      padding: 5px;
+      
+    }
+
+    nav a:hover {
+      color: #b1885e;
+      background-color: #e5ded6;
+      width: 100px;
+      border-radius: 15px;
+      
+    }
+
+
+    /* Full-screen sections */
+    .section,
+    .home {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .section .container,
+    .home .home-content {
+      text-align: center;
+    }
+
+    /* Hero Section */
+    .home {
+      position: relative;
+      background-image: url('img/SHOP.jpg'); 
+      background-size: cover;
+      background-position: center;
+      padding: 4rem 2rem;
+      z-index: 0;
+    }
+
+    .home::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(20, 20, 20, 0.6); /* adjust transparency here */
+      z-index: -1;
+    }
+
+
+    .home h2 {
+      color: #e5ded6;
+      font-size: 5rem;
+      margin-bottom: 1rem;
+    }
+
+    .home p {
+      color: #e5ded6;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .home-img {
+      max-width: 600px;
+      height: 300px;
+      border: 4px solid #4b2e1f;
+    }
+
+    /* Section Style */
+    .menu.light {
+      background-color: #f4ede4;
+    }
+
+    .menu-content {
+      width: 100%;
+      max-width: 1200px;
+      min-height: 100vh;
+      margin: auto;
+      padding: 2rem 0;
+    }
+
+
+    .menu h2 {
+      font-size: 2rem;
+      margin-top: 8%;
+      margin-bottom: 3rem;
+    }
+
+    /* Menu Grid */
+    .menu-grid {
+      margin-top: 5%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .menu-item {
+      text-align: center;
+      padding: 1rem;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px #b1885e; 
+    }
+
+    .menu-item h3 {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+    }
+
+
+    .about-content {
+      width: 100%;
+      max-width: 1200px;
+      min-height: 100vh;
+      margin: auto;
+      padding: 2rem 0;
+    }
+
+    .about h2 {
+      font-size: 2rem;
+      margin-top: 8%;
+      margin-bottom: 2rem;
+    }
+
+    /* About Image */
+    .about-img {
+      display: block;
+      margin: 2rem auto;
+      max-width: 650px;
+      border: 4px solid #ccc;
+    }
+
+    .about p {
+      margin: 2rem 0;
+      font-size: 1.2rem;
+      line-height: 1.5;
+    }
+
+
+
+    .contact {
+      background-color: #ffffff; 
+      padding: 60px 20px; 
+      display: flex;
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh;
+    }
+
+    .contact-content {
+      text-align: center; 
+      width: 500px; 
+      height: 500px;
+      padding: 30px; 
+      border-radius: 10px;
+      box-shadow: 0 10px 20px #b1885e; 
+      background-color: #fff;
+    }
+
+    h2 {
+      font-size: 2.5rem; 
+      font-weight: bold;
+      color: #333; 
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #555; 
+      margin-top: 15%;
+      margin-bottom: 15px; 
+      line-height: 1.5; 
+    }
+
+    p:hover {
+      color: #b1885e; 
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+
+
+
+
+    @media (max-width: 768px) {
+      header {
+        height: 80px;
+        padding: 1rem;
+        text-align: center;
+      }
+
+      header h1 {
+        font-size: 1.2rem;
+        margin: 0;
+        margin-top: -9%;
+      }
+
+      nav ul {
+        flex-direction: row; /* keep inline */
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 0.5rem;
+        margin-left: -25%;
+        padding: 0;
+      }
+
+      nav li {
+        display: inline-block;
+      }
+
+      nav a {
+        font-size: 13px;
+        padding: 5px 8px;
+      }
+
+      /* Add responsive styles for the Logout button */
+      #logoutBtn {
+        margin-right: -250px; /* Remove large margin */
+        margin-top: 2px;
+        background-color: #6b4f4f;
+        color: white;
+        border: none;
+        padding: 2px 2px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .home {
+        padding: 2rem 1rem;
+        background-position: center;
+      }
+
+      .home h2 {
+        font-size: 3rem;
+      }
+
+      .home p {
+        font-size: 1.5rem;
+      }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .about-content {
+        padding: 2rem 1rem;
+      }
+
+      .about-img {
+        max-width: 90%;
+      }
+
+      .about p {
+        font-size: 1.2rem;
+        margin: 2rem 0;
+      }
+
+      .contact-content {
+        width: 90%;
+        height: auto;
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+        margin-top: 10%;
+        margin-bottom: 10px;
+      }
+    }
+
+
+  </style>
+
+</head>
+
+<body>
+
+<!-- Pages -->
+<div id="index" class="page" style="display:none;">
+  <header>
+    <div class="header">
+      <h1>Brew Haven</h1>
+      <nav>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><button onclick="logout()"  style="margin-left: 450%;background-color:#6b4f4f; color:white; border:none; padding:8px 16px; border-radius:5px; cursor:pointer;">Logout</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section id="home" class="home">
+    <div class="home-content">
+      <h2>Welcome to Brew Haven</h2>
+      <p>Your daily dose of perfect coffee</p>
+    </div>
+  </section>
+
+  <section id="menu" class="menu">
+    <div class="menu-content">
+      <h2>Our Menu</h2>
+      <div class="menu-grid">
+        <div class="menu-item">
+          <img src="img/espresso.jpg" alt="Espresso">
+          <h3>Espresso</h3>
+          <p>Strong and bold, just how you like it.</p>
+        </div>
+        <div class="menu-item">
+          <img src="img/latte.jpg" alt="Latte">
+          <h3>Latte</h3>
+          <p>Smooth and creamy with a shot of espresso.</p>
+        </div>
+        <div class="menu-item">
+          <img src="img/Gevalia Cappuccino.jpg" alt="Cappuccino">
+          <h3>Cappuccino</h3>
+          <p>Perfect balance of espresso, steamed milk, and foam.</p>
+        </div>
+        <div class="menu-item">
+          <img src="img/Cold brew Latte.jpg" alt="Cold Brew">
+          <h3>Cold Brew</h3>
+          <p>Chilled, refreshing, and flavorful.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <div class="about-content">
+      <h2>About Us</h2>
+      <img src="img/barista.jpg" alt="Barista preparing coffee" class="about-img">
+      <p>At Brew Haven, we're passionate about serving quality coffee in a warm, welcoming space. We source our beans ethically and roast them locally for the freshest cup every time.</p>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="contact-content">
+      <h2>Contact Us</h2>
+      <p>237 Rizal St. Dapa</p>
+      <p>Email: hello@brewhaven.com</p>
+      <p>Phone: (123) 456-7890</p>
+    </div>
+  </section>
+
+</div>
+
+<div id="register" class="page" style="display:none;">
+  <div class="auth-container">
+    <h2>Brew Haven</h2>
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="text" id="regUsername" placeholder="Username" required>
+      <input type="password" id="regPassword" placeholder="Password" required>
+      <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="#login">Login here</a></p>
+  </div>
+</div>
+
+<div id="login" class="page" style="display:none;">
+  <div class="auth-container">
+    <h2>Brew Haven</h2>
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="loginUsername" placeholder="Username" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="#register">Register here</a></p>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    document.getElementById(page).style.display = 'block';
+    document.body.className = page + '-body';
+  }
+
+  function checkLogin() {
+    const user = localStorage.getItem('loggedInUser');
+    if (!user) {
+      location.hash = 'login';
+      showPage('login');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (location.hash) {
+      handleRouting();
+    } else {
+      location.hash = 'login';
+      showPage('login');
+    }
+  });
+
+  window.addEventListener('hashchange', handleRouting);
+
+  function handleRouting() {
+    const page = location.hash.substring(1);
+    const user = localStorage.getItem('loggedInUser');
+
+    if (page === 'index' && !user) {
+      Swal.fire({
+        title: 'Access Denied!',
+        text: 'You must login first.',
+        icon: 'warning',
+        confirmButtonColor: '#6b4f4f'
+      }).then(() => {
+        location.hash = 'login';
+      });
+    } else {
+      showPage(page);
+    }
+  }
+
+  // Register
+  document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+
+    if (localStorage.getItem(username)) {
+      Swal.fire('Error', 'Username already exists!', 'error');
+    } else {
+      localStorage.setItem(username, password);
+      Swal.fire('Success', 'Registered Successfully!', 'success').then(() => {
+        location.hash = 'login';
+      });
+    }
+  });
+
+  // Login
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    const storedPassword = localStorage.getItem(username);
+
+    if (storedPassword && storedPassword === password) {
+      localStorage.setItem('loggedInUser', username);
+      Swal.fire('Success', 'Login Successful!', 'success').then(() => {
+        location.hash = 'index';
+      });
+    } else {
+      Swal.fire('Error', 'Invalid Username or Password!', 'error');
+    }
+  });
+
+  function logout() {
+    Swal.fire({
+      title: 'Are you sure you want to logout?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#6b4f4f',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, logout'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('loggedInUser');
+        Swal.fire('Logged out', 'See you again!', 'success').then(() => {
+          location.hash = 'login';
+        });
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
