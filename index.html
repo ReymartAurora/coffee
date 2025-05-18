@@ -105,8 +105,18 @@
       gap: 5rem;
       justify-content: center;
       margin-top: -4%;
+      margin-left: 20%;
+      align-items: center;
+      padding-right: 2rem; 
     }
 
+    nav ul li:last-child {
+      margin-left: auto; 
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-right: 1rem; 
+    }
 
     nav a {
       color: #fff;
@@ -123,6 +133,32 @@
       width: 100px;
       border-radius: 15px;
       
+    }
+
+    #clientName {
+      color: #ffffff;
+      font-weight: bold;
+      margin-right: 10px;
+      margin-left: auto;
+      font-size: 16px;
+      align-self: center;
+      margin-left: 60%;
+    }
+
+    .logout-btn {
+      background-color: #b1885e;
+      color: #ffffff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-left: 15%;
+    }
+
+    .logout-btn:hover {
+      background-color: #a17450;
     }
 
 
@@ -188,6 +224,7 @@
       min-height: 100vh;
       margin: auto;
       padding: 2rem 0;
+      height: 80px;
     }
 
 
@@ -199,7 +236,7 @@
 
     /* Menu Grid */
     .menu-grid {
-      margin-top: 5%;
+      margin-top: 3%;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 2rem;
@@ -208,14 +245,24 @@
     .menu-item {
       text-align: center;
       padding: 1rem;
+      height: 450px;
       background-color: #fff;
       border-radius: 10px;
       box-shadow: 0 10px 20px #b1885e; 
     }
 
+    .menu-item img {
+      height: auto;
+      width: 200px;
+    }
+
     .menu-item h3 {
       margin-top: 1rem;
       font-size: 1.2rem;
+    }
+
+    .menu-item .description {
+      margin-top: -0.5%;
     }
 
     .menu-item .price {
@@ -230,6 +277,7 @@
       border: none;
       cursor: pointer;
       border-radius: 4px;
+      margin-top: 2;
     }
 
     .buy-button:hover {
@@ -343,9 +391,8 @@
         padding: 5px 8px;
       }
 
-      /* Add responsive styles for the Logout button */
       #logoutBtn {
-        margin-right: -250px; /* Remove large margin */
+        margin-right: -200px; /* Remove large margin */
         margin-top: 2px;
         background-color: #6b4f4f;
         color: white;
@@ -422,7 +469,10 @@
           <li><a href="#index/menu">Menu</a></li>
           <li><a href="#index/about">About</a></li>
           <li><a href="#index/contact">Contact</a></li>
-          <li><button onclick="logout()"  style="margin-left: 450%;background-color:#6b4f4f; color:white; border:none; padding:8px 16px; border-radius:5px; cursor:pointer;">Logout</button></li>
+          <li id="userNav" style="display:none;">
+            <span id="clientName"></span>
+            <button onclick="logout()" class="logout-btn">Logout</button>
+          </li>
         </ul>
       </nav>
     </div>
@@ -442,28 +492,28 @@
         <div class="menu-item">
           <img src="img/espresso.jpg" alt="Espresso">
           <h3>Espresso</h3>
-          <p>Strong and bold, just how you like it.</p>
+          <p class="description">Strong and bold, just how you like it.</p>
           <p class="price">$2.50</p>
           <button class="buy-button">Buy</button>
         </div>
         <div class="menu-item">
           <img src="img/latte.jpg" alt="Latte">
           <h3>Latte</h3>
-          <p>Smooth and creamy with a shot of espresso.</p>
+          <p class="description">Smooth and creamy with a shot of espresso.</p>
           <p class="price">$3.50</p>
           <button class="buy-button">Buy</button>
         </div>
         <div class="menu-item">
           <img src="img/Gevalia Cappuccino.jpg" alt="Cappuccino">
           <h3>Cappuccino</h3>
-          <p>Perfect balance of espresso, steamed milk, and foam.</p>
+          <p class="description">Perfect balance of espresso, steamed milk, and foam.</p>
           <p class="price">$3.00</p>
           <button class="buy-button">Buy</button>
         </div>
         <div class="menu-item">
           <img src="img/Cold brew Latte.jpg" alt="Cold Brew">
           <h3>Cold Brew</h3>
-          <p>Chilled, refreshing, and flavorful.</p>
+          <p class="description">Chilled, refreshing, and flavorful.</p>
           <p class="price">$3.75</p>
           <button class="buy-button">Buy</button>
         </div>
@@ -525,40 +575,38 @@
     document.body.className = page + '-body';
   }
 
-  function checkLogin() {
-    const user = localStorage.getItem('loggedInUser');
-    if (!user) {
-      location.hash = 'login';
-      showPage('login');
-    }
-  }
-
+  // Remove login check on page load, always show index if hash is missing
   document.addEventListener('DOMContentLoaded', () => {
     if (location.hash) {
       handleRouting();
     } else {
-      location.hash = 'login';
-      showPage('login');
+      location.hash = 'index';
+      showPage('index');
     }
+    updateClientName();
   });
 
-  window.addEventListener('hashchange', handleRouting);
+  window.addEventListener('hashchange', () => {
+    handleRouting();
+    updateClientName();
+  });
 
+  // Updated routing: no login required to view any page
   function handleRouting() {
-    const page = location.hash.substring(1);
-    const user = localStorage.getItem('loggedInUser');
-
-    if (page === 'index' && !user) {
-      Swal.fire({
-        title: 'Access Denied!',
-        text: 'You must login first.',
-        icon: 'warning',
-        confirmButtonColor: '#6b4f4f'
-      }).then(() => {
-        location.hash = 'login';
-      });
+    const hash = location.hash.substring(1);
+    if (hash.startsWith('index')) {
+      showPage('index');
+      const sectionId = hash.split('/')[1];
+      if (sectionId) {
+        setTimeout(() => {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      }
     } else {
-      showPage(page);
+      showPage(hash);
     }
   }
 
@@ -590,6 +638,7 @@
       localStorage.setItem('loggedInUser', username);
       Swal.fire('Success', 'Login Successful!', 'success').then(() => {
         location.hash = 'index';
+        updateClientName();
       });
     } else {
       Swal.fire('Error', 'Invalid Username or Password!', 'error');
@@ -607,6 +656,7 @@
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.removeItem('loggedInUser');
+        updateClientName();
         Swal.fire('Logged out', 'See you again!', 'success').then(() => {
           location.hash = 'login';
         });
@@ -614,41 +664,90 @@
     });
   }
 
-
-  function handleRouting() {
-  const hash = location.hash.substring(1);
-  const user = localStorage.getItem('loggedInUser');
-
-  if (hash.startsWith('index')) {
-    if (!user) {
-      Swal.fire({
-        title: 'Access Denied!',
-        text: 'You must login first.',
-        icon: 'warning',
-        confirmButtonColor: '#6b4f4f'
-      }).then(() => {
-        location.hash = 'login';
-      });
-      return;
+  // Show client name beside logout if logged in
+  function updateClientName() {
+    const user = localStorage.getItem('loggedInUser');
+    const nameSpan = document.getElementById('clientName');
+    const userNav = document.getElementById('userNav');
+    if (user && nameSpan && userNav) {
+      nameSpan.textContent = user;
+      nameSpan.style.display = 'inline-block';
+      userNav.style.display = 'flex';
+    } else if (nameSpan && userNav) {
+      nameSpan.textContent = '';
+      nameSpan.style.display = 'none';
+      userNav.style.display = 'none';
     }
-
-    showPage('index');
-
-    const sectionId = hash.split('/')[1];
-    if (sectionId) {
-      setTimeout(() => {
-        const section = document.getElementById(sectionId);
-        if (section) {
-          section.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    }
-
-  } else {
-    showPage(hash);
   }
-}
 
+  // BUY BUTTON LOGIC
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.buy-button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const user = localStorage.getItem('loggedInUser');
+        if (!user) {
+          Swal.fire({
+            title: 'Sign in required',
+            text: 'You must login or register to buy coffee.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Login',
+            cancelButtonText: 'Register',
+            confirmButtonColor: '#6b4f4f',
+            cancelButtonColor: '#b1885e'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              location.hash = 'login';
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              location.hash = 'register';
+            }
+          });
+        } else {
+          // Get product name
+          const product = btn.parentElement.querySelector('h3').textContent;
+          Swal.fire({
+            title: `<span style="color:#6b4f4f;font-size:1.5rem;">Order ${product}</span>`,
+            html:
+              `<div style="display:flex;flex-direction:column;align-items:center;">
+                <label style="font-weight:bold;margin-bottom:5px;color:#4b2e1f;">Quantity</label>
+                <input id="swal-qty" type="number" min="1" placeholder="Quantity" class="swal2-input" style="margin-bottom:15px;width:80%;border-radius:8px;border:1px solid #b1885e;height:40px;">
+                <label style="font-weight:bold;margin-bottom:5px;color:#4b2e1f;">Delivery Address</label>
+                <input id="swal-address" type="text" placeholder="Delivery Address" class="swal2-input" style="width:80%;border-radius:8px;border:1px solid #b1885e;height:40px;">
+              </div>`,
+            background: '#f5eee6',
+            customClass: {
+              popup: 'swal2-buy-modal'
+            },
+            willOpen: (el) => {
+              el.style.borderRadius = '18px';
+            },
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: '<span style="font-weight:bold;">Order</span>',
+            confirmButtonColor: '#6b4f4f',
+            cancelButtonColor: '#b1885e',
+            preConfirm: () => {
+              const qty = document.getElementById('swal-qty').value;
+              const address = document.getElementById('swal-address').value.trim();
+              if (!qty || qty < 1 || !address) {
+                Swal.showValidationMessage('Please enter a valid quantity and address.');
+                return false;
+              }
+              return { qty, address };
+            }
+          }).then((result) => {
+            if (result.isConfirmed && result.value) {
+              Swal.fire(
+                'Thank you!',
+                `Your order for <b style="color:#4b2e1f;">${result.value.qty} ${product}(s)</b> will be delivered to:<br><b style="color:#4b2e1f;">${result.value.address}</b>`,
+                'success'
+              );
+            }
+          });
+        }
+      });
+    });
+  });
 </script>
 
 </body>
