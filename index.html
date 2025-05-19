@@ -470,6 +470,10 @@
           <li><a href="#index/about">About</a></li>
           <li><a href="#index/contact">Contact</a></li>
           <li id="userNav" style="display:none;">
+            <!-- Order button beside client name -->
+            <span id="orderNav" style="margin-right:10px;">
+              <a href="javascript:void(0);" id="orderBtn" style="color:#fff;font-weight:bold;">Order</a>
+            </span>
             <span id="clientName"></span>
             <button onclick="logout()" class="logout-btn">Logout</button>
           </li>
@@ -664,24 +668,184 @@
     });
   }
 
+  // Utility: Get ratings for a product
+  function getProductRatings(product) {
+    return JSON.parse(localStorage.getItem('ratings_' + product) || '[]');
+  }
+
+  // Utility: Add a rating for a product
+  function addProductRating(product, rating, feedback, user) {
+    const ratingsKey = 'ratings_' + product;
+    const ratings = JSON.parse(localStorage.getItem(ratingsKey) || '[]');
+    ratings.push({ rating, feedback, user, date: new Date().toISOString() });
+    localStorage.setItem(ratingsKey, JSON.stringify(ratings));
+  }
+
+  // Utility: Render only ratings (no feedback) in menu
+  function renderMenuRatings() {
+    document.querySelectorAll('.menu-item').forEach(item => {
+      const product = item.querySelector('h3').textContent;
+      const ratings = getProductRatings(product);
+      let avg = 0;
+      if (ratings.length > 0) {
+        avg = ratings.reduce((sum, r) => sum + Number(r.rating), 0) / ratings.length;
+        avg = Math.round(avg * 10) / 10;
+      }
+      // Remove old rating/feedback display if exists
+      let ratingDiv = item.querySelector('.rating-display');
+      if (!ratingDiv) {
+        ratingDiv = document.createElement('div');
+        ratingDiv.className = 'rating-display';
+        ratingDiv.style.marginTop = '8px';
+        item.appendChild(ratingDiv);
+      }
+      if (ratings.length > 0) {
+        ratingDiv.innerHTML = `
+          <span style="color:#FFD700;font-size:1.2em;">
+            ${'★'.repeat(Math.round(avg))}${'☆'.repeat(5 - Math.round(avg))}
+          </span>
+          <span style="color:#333;font-size:0.95em;margin-left:8px;">${avg} / 5</span>
+        `;
+      } else {
+        ratingDiv.innerHTML = `<span style="color:#bbb;font-size:0.95em;">No ratings yet</span>`;
+      }
+    });
+  }
+
   // Show client name beside logout if logged in
   function updateClientName() {
     const user = localStorage.getItem('loggedInUser');
     const nameSpan = document.getElementById('clientName');
     const userNav = document.getElementById('userNav');
+    const orderNav = document.getElementById('orderNav');
     if (user && nameSpan && userNav) {
       nameSpan.textContent = user;
       nameSpan.style.display = 'inline-block';
       userNav.style.display = 'flex';
+      if (orderNav) orderNav.style.display = 'inline-block';
     } else if (nameSpan && userNav) {
       nameSpan.textContent = '';
       nameSpan.style.display = 'none';
       userNav.style.display = 'none';
+      if (orderNav) orderNav.style.display = 'none';
     }
+    renderMenuRatings();
   }
 
   // BUY BUTTON LOGIC
   document.addEventListener('DOMContentLoaded', function() {
+    // Order button click handler
+    const orderBtn = document.getElementById('orderBtn');
+    if (orderBtn) {
+      orderBtn.addEventListener('click', function() {
+        const user = localStorage.getItem('loggedInUser');
+        if (!user) {
+          Swal.fire('Not logged in', 'Please login to view your orders.', 'info');
+          return;
+        }
+        // Retrieve orders for this user
+        const ordersKey = 'orders_' + user;
+        const orders = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+        if (orders.length === 0) {
+          Swal.fire('No Orders', 'You have not placed any orders yet.', 'info');
+        } else {
+          let html = '<ul style="text-align:left;">';
+          orders.forEach((order, idx) => {
+            html += `<li style="margin-bottom:10px;">
+              <b>${order.product}</b> &times; ${order.qty}<br>
+              <span style="font-size:0.95em;color:#555;">Address: ${order.address}</span><br>
+              <span style="font-size:0.95em;color:${order.status === 'Received' ? '#4CAF50' : '#b1885e'};">
+                Status: <b>${order.status === 'Received' ? 'Order Received' : (order.status || 'Pending')}</b>
+              </span>
+              ${order.status !== 'Received' ? `<button class="mark-received-btn" data-idx="${idx}" style="margin-left:10px;padding:2px 8px;font-size:0.9em;border-radius:6px;border:none;background:#4CAF50;color:#fff;cursor:pointer;">Order Received</button>` : ''}
+            </li>`;
+          });
+          html += '</ul>';
+          Swal.fire({
+            title: 'Your Orders',
+            html: html,
+            width: 400,
+            background: '#f5eee6',
+            confirmButtonColor: '#6b4f4f',
+            didOpen: () => {
+              // Add event listeners for "Order Received" buttons
+              document.querySelectorAll('.mark-received-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                  const idx = parseInt(btn.getAttribute('data-idx'));
+                  const ordersArr = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+                  if (ordersArr[idx]) {
+                    ordersArr[idx].status = 'Received';
+                    localStorage.setItem(ordersKey, JSON.stringify(ordersArr));
+                    Swal.close();
+                    // Prompt for rating and feedback
+                    const product = ordersArr[idx].product;
+                    Swal.fire({
+                      title: `Rate your ${product}`,
+                      html: `
+                        <div style="margin-bottom:10px;">
+                          <span id="star-container" style="font-size:2em;cursor:pointer;">
+                            ${[1,2,3,4,5].map(i => `<span class="star" data-val="${i}" style="color:#ccc;">★</span>`).join('')}
+                          </span>
+                        </div>
+                        <textarea id="swal-feedback" class="swal2-textarea" placeholder="Leave feedback..." style="width:90%;border-radius:8px;border:1px solid #b1885e;"></textarea>
+                      `,
+                      background: '#f5eee6',
+                      showCancelButton: true,
+                      confirmButtonText: 'Submit',
+                      confirmButtonColor: '#6b4f4f',
+                      cancelButtonColor: '#b1885e',
+                      preConfirm: () => {
+                        const rating = Number(document.querySelector('.star.selected')?.getAttribute('data-val') || 0);
+                        const feedback = document.getElementById('swal-feedback').value.trim();
+                        if (!rating) {
+                          Swal.showValidationMessage('Please select a star rating.');
+                          return false;
+                        }
+                        return { rating, feedback };
+                      },
+                      didOpen: () => {
+                        // Star rating logic
+                        const stars = document.querySelectorAll('.star');
+                        stars.forEach(star => {
+                          star.addEventListener('mouseover', function() {
+                            const val = Number(star.getAttribute('data-val'));
+                            stars.forEach(s => {
+                              s.style.color = Number(s.getAttribute('data-val')) <= val ? '#FFD700' : '#ccc';
+                            });
+                          });
+                          star.addEventListener('mouseout', function() {
+                            const selected = document.querySelector('.star.selected');
+                            const val = selected ? Number(selected.getAttribute('data-val')) : 0;
+                            stars.forEach(s => {
+                              s.style.color = Number(s.getAttribute('data-val')) <= val ? '#FFD700' : '#ccc';
+                            });
+                          });
+                          star.addEventListener('click', function() {
+                            stars.forEach(s => s.classList.remove('selected'));
+                            star.classList.add('selected');
+                            const val = Number(star.getAttribute('data-val'));
+                            stars.forEach(s => {
+                              s.style.color = Number(s.getAttribute('data-val')) <= val ? '#FFD700' : '#ccc';
+                            });
+                          });
+                        });
+                      }
+                    }).then(result => {
+                      if (result.isConfirmed && result.value) {
+                        addProductRating(product, result.value.rating, result.value.feedback, user);
+                        renderMenuRatings();
+                        Swal.fire('Thank you!', 'Your feedback has been submitted.', 'success');
+                      }
+                    });
+                  }
+                });
+              });
+            }
+          });
+        }
+      });
+    }
+
     document.querySelectorAll('.buy-button').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const user = localStorage.getItem('loggedInUser');
@@ -737,6 +901,17 @@
             }
           }).then((result) => {
             if (result.isConfirmed && result.value) {
+              // Save order to localStorage, with status
+              const order = {
+                product,
+                qty: result.value.qty,
+                address: result.value.address,
+                status: 'Pending'
+              };
+              const ordersKey = 'orders_' + user;
+              const orders = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+              orders.push(order);
+              localStorage.setItem(ordersKey, JSON.stringify(orders));
               Swal.fire(
                 'Thank you!',
                 `Your order for <b style="color:#4b2e1f;">${result.value.qty} ${product}(s)</b> will be delivered to:<br><b style="color:#4b2e1f;">${result.value.address}</b>`,
@@ -747,6 +922,9 @@
         }
       });
     });
+
+    // Render menu ratings on load
+    renderMenuRatings();
   });
 </script>
 
