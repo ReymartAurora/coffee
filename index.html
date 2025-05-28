@@ -165,7 +165,7 @@
     /* Full-screen sections */
     .section,
     .home {
-      min-height: 100vh;
+      min-height: 87.5vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -221,7 +221,7 @@
     .menu-content {
       width: 100%;
       max-width: 1200px;
-      min-height: 100vh;
+      min-height: auto;
       margin: auto;
       padding: 2rem 0;
       height: 80px;
@@ -230,7 +230,6 @@
 
     .menu h2 {
       font-size: 2rem;
-      margin-top: 8%;
       margin-bottom: 3rem;
     }
 
@@ -316,18 +315,16 @@
     }
 
 
-
     .about-content {
       width: 100%;
       max-width: 1200px;
-      min-height: 100vh;
+      min-height: auto;
       margin: auto;
       padding: 2rem 0;
     }
 
     .about h2 {
       font-size: 2rem;
-      margin-top: 8%;
       margin-bottom: 2rem;
     }
 
@@ -346,14 +343,14 @@
     }
 
 
-
+    
     .contact {
       background-color: #ffffff; 
       padding: 60px 20px; 
       display: flex;
       justify-content: center; 
       align-items: center; 
-      height: 100vh;
+      height: auto;
     }
 
     .contact-content {
@@ -364,6 +361,12 @@
       border-radius: 10px;
       box-shadow: 0 10px 20px #b1885e; 
       background-color: #fff;
+      margin: 0 auto; /* center horizontally */
+      margin-top: 4%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
     h2 {
@@ -385,6 +388,15 @@
       color: #b1885e; 
       cursor: pointer;
       transition: color 0.3s ease;
+    }
+
+    .contact.section-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh;
+      background: transparent;
+      padding: 0;
     }
 
     @media (max-width: 768px) {
@@ -465,6 +477,7 @@
         width: 90%;
         height: auto;
         padding: 20px;
+        margin: 0 auto;
       }
 
       h2 {
@@ -475,6 +488,10 @@
         font-size: 1rem;
         margin-top: 10%;
         margin-bottom: 10px;
+      }
+
+      .contact.section-content {
+        min-height: 40vh;
       }
     }
 
@@ -492,10 +509,10 @@
       <h1>Brew Haven</h1>
       <nav>
         <ul>
-          <li><a href="#index/home">Home</a></li>
-          <li><a href="#index/menu">Menu</a></li>
-          <li><a href="#index/about">About</a></li>
-          <li><a href="#index/contact">Contact</a></li>
+          <li><a href="#index/home" class="section-link" data-section="home">Home</a></li>
+          <li><a href="#index/menu" class="section-link" data-section="menu">Menu</a></li>
+          <li><a href="#index/about" class="section-link" data-section="about">About</a></li>
+          <li><a href="#index/contact" class="section-link" data-section="contact">Contact</a></li>
           <li id="userNav" style="display:none;">
             <!-- Order button beside client name -->
             <span id="orderNav" style="margin-right:10px;">
@@ -509,40 +526,40 @@
     </div>
   </header>
 
-  <section id="home" class="home">
-    <div class="home-content">
-      <h2>Welcome to Brew Haven</h2>
-      <p>Your daily dose of perfect coffee</p>
-    </div>
-  </section>
-
-  <section id="menu" class="menu">
-    <div class="menu-content">
-      <h2>Our Menu</h2>
-      <div class="menu-grid" id="menuGrid">
-        <!-- Menu items will be rendered here -->
+  <div id="section-container">
+    <section id="home" class="home section-content">
+      <div class="home-content">
+        <h2>Welcome to Brew Haven</h2>
+        <p>Your daily dose of perfect coffee</p>
       </div>
-    </div>
-  </section>
-  
+    </section>
 
-  <section id="about" class="about">
-    <div class="about-content">
-      <h2>About Us</h2>
-      <img src="img/barista.jpg" alt="Barista preparing coffee" class="about-img">
-      <p>At Brew Haven, we're passionate about serving quality coffee in a warm, welcoming space. We source our beans ethically and roast them locally for the freshest cup every time.</p>
-    </div>
-  </section>
+    <section id="menu" class="menu section-content" style="display:none;">
+      <div class="menu-content">
+        <h2>Our Menu</h2>
+        <div class="menu-grid" id="menuGrid">
+          <!-- Menu items will be rendered here -->
+        </div>
+      </div>
+    </section>
+    
+    <section id="about" class="about section-content" style="display:none;">
+      <div class="about-content">
+        <h2>About Us</h2>
+        <img src="img/barista.jpg" alt="Barista preparing coffee" class="about-img">
+        <p>At Brew Haven, we're passionate about serving quality coffee in a warm, welcoming space. We source our beans ethically and roast them locally for the freshest cup every time.</p>
+      </div>
+    </section>
 
-  <section id="contact" class="contact">
-    <div class="contact-content">
-      <h2>Contact Us</h2>
-      <p>237 Rizal St. Dapa</p>
-      <p>Email: hello@brewhaven.com</p>
-      <p>Phone: (123) 456-7890</p>
-    </div>
-  </section>
-
+    <section id="contact" class="contact section-content" style="display:none;">
+      <div class="contact-content">
+        <h2>Contact Us</h2>
+        <p>237 Rizal St. Dapa</p>
+        <p>Email: hello@brewhaven.com</p>
+        <p>Phone: (123) 456-7890</p>
+      </div>
+    </section>
+  </div>
 </div>
 
 <div id="register" class="page" style="display:none;">
@@ -595,24 +612,36 @@
     updateClientName();
   });
 
-  // Updated routing: no login required to view any page
+  // Show only the selected section inside the index page
+  function showSection(sectionId) {
+    document.querySelectorAll('#section-container .section-content').forEach(sec => {
+      sec.style.display = (sec.id === sectionId) ? 'block' : 'none';
+    });
+  }
+
+  // Modified routing: show only the selected section in the container
   function handleRouting() {
     const hash = location.hash.substring(1);
     if (hash.startsWith('index')) {
       showPage('index');
-      const sectionId = hash.split('/')[1];
-      if (sectionId) {
-        setTimeout(() => {
-          const section = document.getElementById(sectionId);
-          if (section) {
-            section.scrollIntoView({ behavior: 'smooth' });
-          }
-        }, 100);
-      }
+      const sectionId = hash.split('/')[1] || 'home';
+      showSection(sectionId);
     } else {
       showPage(hash);
     }
   }
+
+  // Add click handlers to nav links to update hash and show section
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.section-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const section = link.getAttribute('data-section');
+        location.hash = 'index/' + section;
+      });
+    });
+    updateClientName();
+  });
 
   // Register
   document.getElementById('registerForm').addEventListener('submit', function(e) {
