@@ -1,0 +1,1083 @@
+<?php
+// Database connection settings
+$host = 'localhost'; // Change if your DB host is different
+$user = 'root';      // Change to your DB username
+$pass = '';          // Change to your DB password
+$dbname = 'coffee_db'; // Change to your DB name
+
+$conn = new mysqli($host, $user, $pass, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Database connection failed: " . $conn->connect_error);
+}
+// $conn is now your active database connection
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brew Haven Coffee</title>
+  
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Styles -->
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .register-body { background: #f5eee6; }
+    .login-body { background: #ede0d4; }
+    .auth-container {
+      background-color: #fff;
+      padding: 30px 40px;
+      max-width: 400px;
+      margin: 100px auto;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .auth-container h2 {
+      margin-bottom: 20px;
+      font-size: 30px;
+    }
+    .auth-container form input, .auth-container button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 14px 16px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    .auth-container button {
+      border: none;
+      background-color: #6b4f4f;
+      color: #fff;
+      cursor: pointer;
+    }
+    .auth-container p { margin-top: 15px; font-size: 14px; }
+    .auth-container a { text-decoration: none; color: #6b4f4f; }
+
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+      line-height: 1.6;
+      background-color: #fdf6f0;
+      color: #3e2f23;
+    }
+
+    img {
+      max-width: 100%;
+      height: 50%;
+      border-radius: 10px;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Container */
+    .header {
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 2rem 0;
+    }
+
+    /* Header */
+    header {
+      background-color: #4b2e1f;
+      height: 90px;
+      color: #fff;
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      margin-left: -6%;
+      margin-top: -2.5%;
+    }
+
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 5rem;
+      justify-content: center;
+      margin-top: -4%;
+      margin-left: 20%;
+      align-items: center;
+      padding-right: 2rem; 
+    }
+
+    nav ul li:last-child {
+      margin-left: auto; 
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-right: 1rem; 
+    }
+
+    nav a {
+      color: #fff;
+      font-weight: bold;  
+      font-size: 18px;
+      transition: color 0.3s ease;
+      padding: 5px;
+      
+    }
+
+    nav a:hover {
+      color: #b1885e;
+      background-color: #e5ded6;
+      width: 100px;
+      border-radius: 15px;
+      
+    }
+
+    #clientName {
+      color: #ffffff;
+      font-weight: bold;
+      margin-right: 10px;
+      margin-left: auto;
+      font-size: 16px;
+      align-self: center;
+      margin-left: 60%;
+    }
+
+    .logout-btn {
+      background-color: #b1885e;
+      color: #ffffff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-left: 15%;
+    }
+
+    .logout-btn:hover {
+      background-color: #a17450;
+    }
+
+
+    /* Full-screen sections */
+    .section,
+    .home {
+      min-height: 87.5vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .section .container,
+    .home .home-content {
+      text-align: center;
+    }
+
+    /* Hero Section */
+    .home {
+      position: relative;
+      background-image: url('img/SHOP.jpg'); 
+      background-size: cover;
+      background-position: center;
+      padding: 4rem 2rem;
+      z-index: 0;
+    }
+
+    .home::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(20, 20, 20, 0.6); /* adjust transparency here */
+      z-index: -1;
+    }
+
+
+    .home h2 {
+      color: #e5ded6;
+      font-size: 5rem;
+      margin-bottom: 1rem;
+    }
+
+    .home p {
+      color: #e5ded6;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .home-img {
+      max-width: 600px;
+      height: 300px;
+      border: 4px solid #4b2e1f;
+    }
+
+    /* Section Style */
+    .menu.light {
+      background-color: #f4ede4;
+    }
+
+    .menu-content {
+      width: 100%;
+      max-width: 1200px;
+      min-height: auto;
+      margin: auto;
+      padding: 2rem 0;
+      height: 80px;
+    }
+
+
+    .menu h2 {
+      font-size: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    /* Menu Grid */
+    .menu-grid {
+      margin-top: 3%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .menu-item {
+      text-align: center;
+      padding: 1.5rem 1rem 1.2rem 1rem;
+      min-height: 420px;
+      background: linear-gradient(135deg, #fff8f0 60%, #f5eee6 100%);
+      border-radius: 18px;
+      box-shadow: 0 6px 24px 0 rgba(177,136,94,0.15), 0 1.5px 4px #b1885e;
+      transition: transform 0.18s, box-shadow 0.18s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-item:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 16px 32px 0 rgba(177,136,94,0.22), 0 2px 8px #b1885e;
+      background: linear-gradient(135deg, #f5eee6 60%, #fff8f0 100%);
+    }
+
+    .menu-item img {
+      height: 140px;
+      width: 140px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #b1885e;
+      margin-bottom: 1rem;
+      background: #fff;
+      box-shadow: 0 2px 8px #e5ded6;
+    }
+
+    .menu-item h3 {
+      margin-top: 0.5rem;
+      font-size: 1.3rem;
+      color: #4b2e1f;
+      letter-spacing: 0.5px;
+    }
+
+    .menu-item .description {
+      margin: 0.5rem 0 0.7rem 0;
+      color: #6b4f4f;
+      font-size: 1.05rem;
+      min-height: 40px;
+    }
+
+    .menu-item .price {
+      font-weight: bold;
+      margin: 10px 0 0.7rem 0;
+      color: #a17450;
+      font-size: 1.1rem;
+    }
+
+    .menu-item .buy-button {
+      padding: 10px 22px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px #b1885e33;
+    }
+
+    .menu-item .buy-button:hover {
+      background-color: #388e3c;
+    }
+
+    .menu-item .rating-display {
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
+
+
+    .about-content {
+      width: 100%;
+      max-width: 1200px;
+      min-height: auto;
+      margin: auto;
+      padding: 2rem 0;
+    }
+
+    .about h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* About Image */
+    .about-img {
+      display: block;
+      margin: 2rem auto;
+      max-width: 650px;
+      border: 4px solid #ccc;
+    }
+
+    .about p {
+      margin: 2rem 0;
+      font-size: 1.2rem;
+      line-height: 1.5;
+    }
+
+
+    
+    .contact {
+      background-color: #ffffff; 
+      padding: 60px 20px; 
+      display: flex;
+      justify-content: center; 
+      align-items: center; 
+      height: auto;
+    }
+
+    .contact-content {
+      text-align: center; 
+      width: 500px; 
+      height: 500px;
+      padding: 30px; 
+      border-radius: 10px;
+      box-shadow: 0 10px 20px #b1885e; 
+      background-color: #fff;
+      margin: 0 auto; /* center horizontally */
+      margin-top: 4%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    h2 {
+      font-size: 2.5rem; 
+      font-weight: bold;
+      color: #333; 
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #555; 
+      margin-top: 15%;
+      margin-bottom: 15px; 
+      line-height: 1.5; 
+    }
+
+    p:hover {
+      color: #b1885e; 
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .contact.section-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh;
+      background: transparent;
+      padding: 0;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        height: 80px;
+        padding: 1rem;
+        text-align: center;
+      }
+
+      header h1 {
+        font-size: 1.2rem;
+        margin: 0;
+        margin-top: -9%;
+      }
+
+      nav ul {
+        flex-direction: row; /* keep inline */
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 0.5rem;
+        margin-left: -25%;
+        padding: 0;
+      }
+
+      nav li {
+        display: inline-block;
+      }
+
+      nav a {
+        font-size: 13px;
+        padding: 5px 8px;
+      }
+
+      #logoutBtn {
+        margin-right: -200px; /* Remove large margin */
+        margin-top: 2px;
+        background-color: #6b4f4f;
+        color: white;
+        border: none;
+        padding: 2px 2px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .home {
+        padding: 2rem 1rem;
+        background-position: center;
+      }
+
+      .home h2 {
+        font-size: 3rem;
+      }
+
+      .home p {
+        font-size: 1.5rem;
+      }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .about-content {
+        padding: 2rem 1rem;
+      }
+
+      .about-img {
+        max-width: 90%;
+      }
+
+      .about p {
+        font-size: 1.2rem;
+        margin: 2rem 0;
+      }
+
+      .contact-content {
+        width: 90%;
+        height: auto;
+        padding: 20px;
+        margin: 0 auto;
+      }
+
+      h2 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+        margin-top: 10%;
+        margin-bottom: 10px;
+      }
+
+      .contact.section-content {
+        min-height: 40vh;
+      }
+    }
+
+
+  </style>
+
+</head>
+
+<body>
+
+<!-- Pages -->
+<div id="index" class="page" style="display:none;">
+  <header>
+    <div class="header">
+      <h1>Brew Haven</h1>
+      <nav>
+        <ul>
+          <li><a href="#index/home" class="section-link" data-section="home">Home</a></li>
+          <li><a href="#index/menu" class="section-link" data-section="menu">Menu</a></li>
+          <li><a href="#index/about" class="section-link" data-section="about">About</a></li>
+          <li><a href="#index/contact" class="section-link" data-section="contact">Contact</a></li>
+          <li id="userNav" style="display:none;">
+            <!-- Order button beside client name -->
+            <span id="orderNav" style="margin-right:10px;">
+              <a href="javascript:void(0);" id="orderBtn" style="color:#fff;font-weight:bold;">Order</a>
+            </span>
+            <span id="clientName"></span>
+            <button onclick="logout()" class="logout-btn">Logout</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div id="section-container">
+    <section id="home" class="home section-content">
+      <div class="home-content">
+        <h2>Welcome to Brew Haven</h2>
+        <p>Your daily dose of perfect coffee</p>
+      </div>
+    </section>
+
+    <section id="menu" class="menu section-content" style="display:none;">
+      <div class="menu-content">
+        <h2>Our Menu</h2>
+        <div class="menu-grid" id="menuGrid">
+          <!-- Menu items will be rendered here -->
+        </div>
+      </div>
+    </section>
+    
+    <section id="about" class="about section-content" style="display:none;">
+      <div class="about-content">
+        <h2>About Us</h2>
+        <img src="img/barista.jpg" alt="Barista preparing coffee" class="about-img">
+        <p>At Brew Haven, we're passionate about serving quality coffee in a warm, welcoming space. We source our beans ethically and roast them locally for the freshest cup every time.</p>
+      </div>
+    </section>
+
+    <section id="contact" class="contact section-content" style="display:none;">
+      <div class="contact-content">
+        <h2>Contact Us</h2>
+        <p>237 Rizal St. Dapa</p>
+        <p>Email: hello@brewhaven.com</p>
+        <p>Phone: (123) 456-7890</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="register" class="page" style="display:none;">
+  <div class="auth-container">
+    <h2>Brew Haven</h2>
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="text" id="regUsername" placeholder="Username" required>
+      <input type="password" id="regPassword" placeholder="Password" required>
+      <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="#login">Login here</a></p>
+  </div>
+</div>
+
+<div id="login" class="page" style="display:none;">
+  <div class="auth-container">
+    <h2>Brew Haven</h2>
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="loginUsername" placeholder="Username" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="#register">Register here</a></p>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    document.getElementById(page).style.display = 'block';
+    document.body.className = page + '-body';
+  }
+
+  // Remove login check on page load, always show index if hash is missing
+  document.addEventListener('DOMContentLoaded', () => {
+    if (location.hash) {
+      handleRouting();
+    } else {
+      location.hash = 'index';
+      showPage('index');
+    }
+    updateClientName();
+  });
+
+  window.addEventListener('hashchange', () => {
+    handleRouting();
+    updateClientName();
+  });
+
+  // Show only the selected section inside the index page
+  function showSection(sectionId) {
+    document.querySelectorAll('#section-container .section-content').forEach(sec => {
+      sec.style.display = (sec.id === sectionId) ? 'block' : 'none';
+    });
+  }
+
+  // Modified routing: show only the selected section in the container
+  function handleRouting() {
+    const hash = location.hash.substring(1);
+    if (hash.startsWith('index')) {
+      showPage('index');
+      const sectionId = hash.split('/')[1] || 'home';
+      showSection(sectionId);
+    } else {
+      showPage(hash);
+    }
+  }
+
+  // Add click handlers to nav links to update hash and show section
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.section-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const section = link.getAttribute('data-section');
+        location.hash = 'index/' + section;
+      });
+    });
+    updateClientName();
+  });
+
+  // Register
+  document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+
+    if (localStorage.getItem(username)) {
+      Swal.fire('Error', 'Username already exists!', 'error');
+    } else {
+      localStorage.setItem(username, password);
+      Swal.fire('Success', 'Registered Successfully!', 'success').then(() => {
+        location.hash = 'login';
+      });
+    }
+  });
+
+  // Login
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    const storedPassword = localStorage.getItem(username);
+
+    if (storedPassword && storedPassword === password) {
+      localStorage.setItem('loggedInUser', username);
+      Swal.fire('Success', 'Login Successful!', 'success').then(() => {
+        location.hash = 'index';
+        updateClientName();
+      });
+    } else {
+      Swal.fire('Error', 'Invalid Username or Password!', 'error');
+    }
+  });
+
+  function logout() {
+    Swal.fire({
+      title: 'Are you sure you want to logout?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#6b4f4f',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, logout'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('loggedInUser');
+        updateClientName();
+        Swal.fire('Logged out', 'See you again!', 'success').then(() => {
+          location.hash = 'login';
+        });
+      }
+    });
+  }
+
+  // Utility: Get ratings for a product
+  function getProductRatings(product) {
+    return JSON.parse(localStorage.getItem('ratings_' + product) || '[]');
+  }
+
+  // Utility: Add a rating for a product
+  function addProductRating(product, rating, feedback, user) {
+    const ratingsKey = 'ratings_' + product;
+    const ratings = JSON.parse(localStorage.getItem(ratingsKey) || '[]');
+    ratings.push({ rating, feedback, user, date: new Date().toISOString() });
+    localStorage.setItem(ratingsKey, JSON.stringify(ratings));
+  }
+
+  // Utility: Get products (admin-defined or default)
+  function getProducts() {
+    // Always use admin-defined products if available
+    const products = JSON.parse(localStorage.getItem('products') || 'null');
+    if (products && Array.isArray(products) && products.length > 0) {
+      return products;
+    }
+  }
+
+  // Render menu items from products
+  function renderMenu() {
+    const grid = document.getElementById('menuGrid');
+    if (!grid) return;
+    const products = getProducts();
+    grid.innerHTML = '';
+    products.forEach(prod => {
+      const div = document.createElement('div');
+      div.className = 'menu-item';
+      div.innerHTML = `
+        <img src="${prod.img}" alt="${prod.name}">
+        <h3>${prod.name}</h3>
+        <p class="description">${prod.desc}</p>
+        <p class="price">$${Number(prod.price).toFixed(2)}</p>
+        <button class="buy-button">Buy</button>
+      `;
+      grid.appendChild(div);
+    });
+    renderMenuRatings();
+    // Re-attach buy button logic
+    document.querySelectorAll('.buy-button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const user = localStorage.getItem('loggedInUser');
+        if (!user) {
+          Swal.fire({
+            title: 'Sign in required',
+            text: 'You must login or register to buy coffee.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Login',
+            cancelButtonText: 'Register',
+            confirmButtonColor: '#6b4f4f',
+            cancelButtonColor: '#b1885e'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              location.hash = 'login';
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              location.hash = 'register';
+            }
+          });
+        } else {
+          // Get product name
+          const product = btn.parentElement.querySelector('h3').textContent;
+          Swal.fire({
+            title: `<span style="color:#6b4f4f;font-size:1.5rem;">Order ${product}</span>`,
+            html:
+              `<div style="display:flex;flex-direction:column;align-items:center;">
+                <label style="font-weight:bold;margin-bottom:5px;color:#4b2e1f;">Quantity</label>
+                <input id="swal-qty" type="number" min="1" placeholder="Quantity" class="swal2-input" style="margin-bottom:15px;width:80%;border-radius:8px;border:1px solid #b1885e;height:40px;">
+                <label style="font-weight:bold;margin-bottom:5px;color:#4b2e1f;">Delivery Address</label>
+                <input id="swal-address" type="text" placeholder="Delivery Address" class="swal2-input" style="width:80%;border-radius:8px;border:1px solid #b1885e;height:40px;">
+              </div>`,
+            background: '#f5eee6',
+            customClass: {
+              popup: 'swal2-buy-modal'
+            },
+            willOpen: (el) => {
+              el.style.borderRadius = '18px';
+            },
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: '<span style="font-weight:bold;">Order</span>',
+            confirmButtonColor: '#6b4f4f',
+            cancelButtonColor: '#b1885e',
+            preConfirm: () => {
+              const qty = document.getElementById('swal-qty').value;
+              const address = document.getElementById('swal-address').value.trim();
+              if (!qty || qty < 1 || !address) {
+                Swal.showValidationMessage('Please enter a valid quantity and address.');
+                return false;
+              }
+              return { qty, address };
+            }
+          }).then((result) => {
+            if (result.isConfirmed && result.value) {
+              // Save order to localStorage, with status
+              const order = {
+                product,
+                qty: result.value.qty,
+                address: result.value.address,
+                status: 'Pending'
+              };
+              const ordersKey = 'orders_' + user;
+              const orders = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+              orders.push(order);
+              localStorage.setItem(ordersKey, JSON.stringify(orders));
+              Swal.fire(
+                'Thank you!',
+                `Your order for <b style="color:#4b2e1f;">${result.value.qty} ${product}(s)</b> will be delivered to:<br><b style="color:#4b2e1f;">${result.value.address}</b>`,
+                'success'
+              );
+            }
+          });
+        }
+      });
+    });
+  }
+
+  // Utility: Render only ratings (no feedback) in menu
+  function renderMenuRatings() {
+    document.querySelectorAll('.menu-item').forEach(item => {
+      const product = item.querySelector('h3').textContent;
+      const ratings = getProductRatings(product);
+      let avg = 0;
+      if (ratings.length > 0) {
+        avg = ratings.reduce((sum, r) => sum + Number(r.rating), 0) / ratings.length;
+        avg = Math.round(avg * 10) / 10;
+      }
+      // Remove old rating/feedback display if exists
+      let ratingDiv = item.querySelector('.rating-display');
+      if (!ratingDiv) {
+        ratingDiv = document.createElement('div');
+        ratingDiv.className = 'rating-display';
+        ratingDiv.style.marginTop = '8px';
+        item.appendChild(ratingDiv);
+      }
+      if (ratings.length > 0) {
+        ratingDiv.innerHTML = `
+          <span style="color:#FFD700;font-size:1.2em;">
+            ${'★'.repeat(Math.round(avg))}${'☆'.repeat(5 - Math.round(avg))}
+          </span>
+          <span style="color:#333;font-size:0.95em;margin-left:8px;">${avg} / 5</span>
+        `;
+      } else {
+        ratingDiv.innerHTML = `<span style="color:#bbb;font-size:0.95em;">No ratings yet</span>`;
+      }
+    });
+  }
+
+  // Show client name beside logout if logged in
+  function updateClientName() {
+    const user = localStorage.getItem('loggedInUser');
+    const nameSpan = document.getElementById('clientName');
+    const userNav = document.getElementById('userNav');
+    const orderNav = document.getElementById('orderNav');
+    if (user && nameSpan && userNav) {
+      nameSpan.textContent = user;
+      nameSpan.style.display = 'inline-block';
+      userNav.style.display = 'flex';
+      if (orderNav) orderNav.style.display = 'inline-block';
+    } else if (nameSpan && userNav) {
+      nameSpan.textContent = '';
+      nameSpan.style.display = 'none';
+      userNav.style.display = 'none';
+      if (orderNav) orderNav.style.display = 'none';
+    }
+    renderMenu();
+  }
+
+  // BUY BUTTON LOGIC
+  document.addEventListener('DOMContentLoaded', function() {
+    // Order button click handler
+    const orderBtn = document.getElementById('orderBtn');
+    if (orderBtn) {
+      orderBtn.addEventListener('click', function() {
+        const user = localStorage.getItem('loggedInUser');
+        if (!user) {
+          Swal.fire('Not logged in', 'Please login to view your orders.', 'info');
+          return;
+        }
+        // Retrieve orders for this user
+        const ordersKey = 'orders_' + user;
+        const orders = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+        if (orders.length === 0) {
+          Swal.fire('No Orders', 'You have not placed any orders yet.', 'info');
+        } else {
+          let html = '<ul style="text-align:left;">';
+          orders.forEach((order, idx) => {
+            html += `<li style="margin-bottom:10px;">
+              <b>${order.product}</b> &times; ${order.qty}<br>
+              <span style="font-size:0.95em;color:#555;">Address: ${order.address}</span><br>
+              <span style="font-size:0.95em;color:${order.status === 'Received' ? '#4CAF50' : '#b1885e'};">
+                Status: <b>${order.status === 'Received' ? 'Order Received' : (order.status || 'Pending')}</b>
+              </span>
+              ${order.status !== 'Received' ? `<button class="mark-received-btn" data-idx="${idx}" style="margin-left:10px;padding:2px 8px;font-size:0.9em;border-radius:6px;border:none;background:#4CAF50;color:#fff;cursor:pointer;">Order Received</button>` : ''}
+            </li>`;
+          });
+          html += '</ul>';
+          Swal.fire({
+            title: 'Your Orders',
+            html: html,
+            width: 400,
+            background: '#f5eee6',
+            confirmButtonColor: '#6b4f4f',
+            didOpen: () => {
+              // Add event listeners for "Order Received" buttons
+              document.querySelectorAll('.mark-received-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                  const idx = parseInt(btn.getAttribute('data-idx'));
+                  const ordersArr = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+                  if (ordersArr[idx]) {
+                    ordersArr[idx].status = 'Received';
+                    localStorage.setItem(ordersKey, JSON.stringify(ordersArr));
+                    Swal.close();
+                    // Prompt for rating and feedback
+                    const product = ordersArr[idx].product;
+                    Swal.fire({
+                      title: `Rate your ${product}`,
+                      html: `
+                        <div style="margin-bottom:10px;">
+                          <span id="star-container" style="font-size:2em;cursor:pointer;">
+                            ${[1,2,3,4,5].map(i => `<span class="star" data-val="${i}" style="color:#ccc;">★</span>`).join('')}
+                          </span>
+                        </div>
+                        <textarea id="swal-feedback" class="swal2-textarea" placeholder="Leave feedback..." style="width:90%;border-radius:8px;border:1px solid #b1885e;"></textarea>
+                      `,
+                      background: '#f5eee6',
+                      showCancelButton: true,
+                      confirmButtonText: 'Submit',
+                      confirmButtonColor: '#6b4f4f',
+                      cancelButtonColor: '#b1885e',
+                      preConfirm: () => {
+                        const rating = Number(document.querySelector('.star.selected')?.getAttribute('data-val') || 0);
+                        const feedback = document.getElementById('swal-feedback').value.trim();
+                        if (!rating) {
+                          Swal.showValidationMessage('Please select a star rating.');
+                          return false;
+                        }
+                        return { rating, feedback };
+                      },
+                      didOpen: () => {
+                        // Star rating logic
+                        const stars = document.querySelectorAll('.star');
+                        stars.forEach(star => {
+                          star.addEventListener('mouseover', function() {
+                            const val = Number(star.getAttribute('data-val'));
+                            stars.forEach(s => {
+                              s.style.color = Number(s.getAttribute('data-val')) <= val ? '#FFD700' : '#ccc';
+                            });
+                          });
+                          star.addEventListener('mouseout', function() {
+                            const selected = document.querySelector('.star.selected');
+                            const val = selected ? Number(selected.getAttribute('data-val')) : 0;
+                            stars.forEach(s => {
+                              s.style.color = Number(s.getAttribute('data-val')) <= val ? '#FFD700' : '#ccc';
+                            });
+                          });
+                          star.addEventListener('click', function() {
+                            stars.forEach(s => s.classList.remove('selected'));
+                            star.classList.add('selected');
+                            const val = Number(star.getAttribute('data-val'));
+                            stars.forEach(s => {
+                              s.style.color = Number(s.getAttribute('data-val')) <= val ? '#FFD700' : '#ccc';
+                            });
+                          });
+                        });
+                      }
+                    }).then(result => {
+                      if (result.isConfirmed && result.value) {
+                        addProductRating(product, result.value.rating, result.value.feedback, user);
+                        renderMenuRatings();
+                        Swal.fire('Thank you!', 'Your feedback has been submitted.', 'success');
+                      }
+                    });
+                  }
+                });
+              });
+            }
+          });
+        }
+      });
+    }
+
+    document.querySelectorAll('.buy-button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const user = localStorage.getItem('loggedInUser');
+        if (!user) {
+          Swal.fire({
+            title: 'Sign in required',
+            text: 'You must login or register to buy coffee.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Login',
+            cancelButtonText: 'Register',
+            confirmButtonColor: '#6b4f4f',
+            cancelButtonColor: '#b1885e'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              location.hash = 'login';
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              location.hash = 'register';
+            }
+          });
+        } else {
+          // Get product name
+          const product = btn.parentElement.querySelector('h3').textContent;
+          Swal.fire({
+            title: `<span style="color:#6b4f4f;font-size:1.5rem;">Order ${product}</span>`,
+            html:
+              `<div style="display:flex;flex-direction:column;align-items:center;">
+                <label style="font-weight:bold;margin-bottom:5px;color:#4b2e1f;">Quantity</label>
+                <input id="swal-qty" type="number" min="1" placeholder="Quantity" class="swal2-input" style="margin-bottom:15px;width:80%;border-radius:8px;border:1px solid #b1885e;height:40px;">
+                <label style="font-weight:bold;margin-bottom:5px;color:#4b2e1f;">Delivery Address</label>
+                <input id="swal-address" type="text" placeholder="Delivery Address" class="swal2-input" style="width:80%;border-radius:8px;border:1px solid #b1885e;height:40px;">
+              </div>`,
+            background: '#f5eee6',
+            customClass: {
+              popup: 'swal2-buy-modal'
+            },
+            willOpen: (el) => {
+              el.style.borderRadius = '18px';
+            },
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: '<span style="font-weight:bold;">Order</span>',
+            confirmButtonColor: '#6b4f4f',
+            cancelButtonColor: '#b1885e',
+            preConfirm: () => {
+              const qty = document.getElementById('swal-qty').value;
+              const address = document.getElementById('swal-address').value.trim();
+              if (!qty || qty < 1 || !address) {
+                Swal.showValidationMessage('Please enter a valid quantity and address.');
+                return false;
+              }
+              return { qty, address };
+            }
+          }).then((result) => {
+            if (result.isConfirmed && result.value) {
+              // Save order to localStorage, with status
+              const order = {
+                product,
+                qty: result.value.qty,
+                address: result.value.address,
+                status: 'Pending'
+              };
+              const ordersKey = 'orders_' + user;
+              const orders = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+              orders.push(order);
+              localStorage.setItem(ordersKey, JSON.stringify(orders));
+              Swal.fire(
+                'Thank you!',
+                `Your order for <b style="color:#4b2e1f;">${result.value.qty} ${product}(s)</b> will be delivered to:<br><b style="color:#4b2e1f;">${result.value.address}</b>`,
+                'success'
+              );
+            }
+          });
+        }
+      });
+    });
+
+    // Render menu ratings on load
+    renderMenuRatings();
+  });
+</script>
+
+</body>
+</html>
